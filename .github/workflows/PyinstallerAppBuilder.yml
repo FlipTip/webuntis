@@ -17,6 +17,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     runs-on: ${{ matrix.os }}
+    needs: create-release
     strategy:
       fail-fast: false
       matrix:
@@ -38,26 +39,32 @@ jobs:
       - run: pip install -r src/requirements.txt pyinstaller
       - run: pyinstaller src/main.py --onefile --noconsole
 
+      - name: upload artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: uploadurl
+          asset_path: ${{ matrix.bin }}
+          asset_name: Vertretungsplan-Tool-${{ matrix.os }}.zip
+          asset_content_type: application/zip
+          
+  create-release:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
       - name: release
         uses: actions/create-release@v1
         id: create_release
         with:
           draft: true
           prerelease: true
-          release_name: ${{ steps.version.outputs.version }}
-          tag_name:  ${{ matrix.os }}
+          release_name: AutoRelease
+          tag_name:  v[AutoBuild]
           body_path: ReadMe.md
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      - name: upload artifact
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ matrix.bin }}
-          asset_name: Vertretungsplan-Tool-${{ matrix.os }}.zip
-          asset_content_type: application/zip
-          
-          
+    outputs:
+      uploadurl: ${{ steps.create_release.outputs.upload_url }}
