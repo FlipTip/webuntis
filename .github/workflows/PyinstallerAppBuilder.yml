@@ -32,20 +32,15 @@ jobs:
       - run: pip install -r src/requirements.txt pyinstaller
       - run: pyinstaller src/main.py --onefile --noconsole
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: Vertretungsplan-Tool ${{ matrix.os }}
-          path: dist/*
-
       - name: release
         uses: actions/create-release@v1
         id: create_release
         with:
           draft: false
-          prerelease: true
+          prerelease: false
           release_name: ${{ steps.version.outputs.version }}
-          tag_name: ${{ github.ref }}
-          body_path: CHANGELOG.md
+          tag_name: ${{ steps.version.outputs.version }}
+          body_path: ReadMe.md
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
