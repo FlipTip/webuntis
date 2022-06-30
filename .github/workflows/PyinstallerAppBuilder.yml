@@ -62,7 +62,7 @@ jobs:
           draft: true
           prerelease: true
           release_name: AutoRelease
-          tag_name:  v[AutoBuild]
+          tag_name:  vAutoBuild
           body_path: ReadMe.md
         env:
           GITHUB_TOKEN: ${{ github.token }}
