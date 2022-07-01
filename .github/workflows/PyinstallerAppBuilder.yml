@@ -27,8 +27,10 @@ jobs:
         include:
         - os: ubuntu-latest
           bin: dist/main
+          exec-suffix: elf
         - os:  windows-latest
           bin: dist/main.exe
+          exec-suffix: exe
 
     steps:
       - uses: actions/checkout@v2
@@ -46,8 +48,8 @@ jobs:
         with:
           upload_url: ${{ needs.create-release.outputs.uploadurl }}
           asset_path: ${{ matrix.bin }}
-          asset_name: Vertretungsplan-Tool-${{ matrix.os }}.zip
-          asset_content_type: application/zip
+          asset_name: Vertretungsplan-Tool-${{ matrix.os }}.${{ exec-suffix }}
+          asset_content_type: application/octet-stream
           
   create-release:
     runs-on: ubuntu-latest
@@ -59,10 +61,10 @@ jobs:
         uses: actions/create-release@v1
         id: create_release
         with:
-          draft: true
+          draft: false
           prerelease: true
           release_name: AutoRelease
-          tag_name:  vAutoBuild
+          tag_name:  ${{ github.run_id }}
           body_path: ReadMe.md
         env:
           GITHUB_TOKEN: ${{ github.token }}
